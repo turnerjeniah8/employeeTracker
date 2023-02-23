@@ -82,15 +82,16 @@ const viewRoles = () => {
     const query = `SELECT title FROM employee_Role`
     connection.query(query, (err, res) => {
         if (err) throw err;
-        res.forEach(({title})) => {
+        res.forEach(({title}) => {
             rolesArray.push(title);
         console.log('Viewing Roles')
         console.table(res)
         console.log(rolesArray)
         employeeUpdate()
-        }
+        })
     })
 };
+
 
 //Function to view all departments
 const viewDepartments = () => {
@@ -102,3 +103,39 @@ const viewDepartments = () => {
         employeeUpdate()
     })
 };
+
+//function to add employees
+const addEmployee = () => {
+    inquirer.prompt([
+        {
+            type: 'input',
+            message: 'What is the employees first name?',
+            name: 'firstName'
+        },
+        {
+            type: 'input', 
+            message: 'What is the employees Last name?',
+            name: 'lastName'
+        },
+        {
+            type: 'input', 
+            message: 'What is the employee manager id?',
+            name: 'managersId'
+        },
+        {
+            type: 'input',
+            message: 'What is the employees role id?',
+            name: 'roleId'
+        }
+    ]).then((answers) => {
+        connection.query(`INSERT INTO employee SET ?`, 
+        {
+            first_name: answers.firstName,
+            last_name: answers.lastName, 
+            manager_id: answers.managersId,
+            role_id:answers.roleId
+        })
+    })
+};
+
+//function to find new department
