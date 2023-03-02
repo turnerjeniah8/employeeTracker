@@ -4,16 +4,19 @@ const fs = require('fs')
 const mysql = require('mysql2');
 require('console.table')
 
-let employeesArray = [];
-let positionArray = [];
+
 
 //connect to sql database
 const connection = mysql.createConnection({
     host: 'localhost',
+    port: 3306,
     user: 'root',
     password: 'password',
     database: 'employeeTracker_db'
 });
+
+let employeesArray = [];
+let positionArray = [];
 
 //First Question for user
 const mainmenu = () => {
@@ -50,6 +53,10 @@ const mainmenu = () => {
                 addEmployee();
                 break;
 
+            case 'Add Departments':
+                addDepartment();
+                break;
+
             case 'Add Roles':
                 addRoles();
                 break;
@@ -62,7 +69,6 @@ const mainmenu = () => {
 };
 
 //view employees function
-
 const viewallEmployees = () => {
     const query = `SELECT employee.id, employee.first_name, employee.last_name, employee_role.title, employee_dept.dept_name, employee_role.salary, CONCAT(manager.first_name, manager.last_name) AS manager FROM employee
     LEFT JOIN employee manager ON manager.id = employee.manager_id
@@ -82,7 +88,7 @@ const viewRoles = () => {
     const query = `SELECT title FROM employee_Role`
     connection.query(query, (err, res) => {
         if (err) throw err;
-        res.forEach(({ title }) => {
+        res.forEach(({title}) => {
             positionArray.push(title);
             console.log('Viewing Roles')
             console.table(res)
@@ -212,18 +218,18 @@ connection.query(query, (err, res) => {
 });
 positionArray = []
 const query2 = `SELECT title FROM employee_Role`
-connection.query(query2, (err, res) => {
+connection.query(query2, (err, res) =>{
     if (err) throw err;
     res.forEach(({ title }) => {
         positionArray.push(title);
     });
 });
 // function to update employee role 
-const updateEmployeeRole = () => {
+const updateEmployeeRole = () =>{
     inquirer.prompt([
         {
             type: 'list',
-            message: 'Which employee would you like to update?',
+            message: 'Enter the name of the Employee you want to update',
             choices: employeesArray,
             name: 'roleUpdate'
         },
@@ -235,16 +241,16 @@ const updateEmployeeRole = () => {
         }
     ]).then((answers) => {
         connection.query(`UPDATE employee_Role SET title = ? WHERE first_name = ?`,
-            {
-                title: answers.newRole,
-                first_name: answers.roleUpdate
-            },
-            (err) => {
-                if (err) throw err;
-                console.log('Employee role updated')
-                console.table(answers)
-                mainmenu()
-            })
+         {
+            title: answers.newRole,
+            first_name: answers.roleUpdate
+         },
+        (err) => {
+         if (err) throw err;
+         console.log('Employee role updated')
+         console.table(answers)
+        mainmenu()
+        })
 
 
     })
